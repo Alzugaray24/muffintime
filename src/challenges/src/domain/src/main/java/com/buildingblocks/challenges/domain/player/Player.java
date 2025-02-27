@@ -1,52 +1,32 @@
 // Player.java
 package com.buildingblocks.challenges.domain.player;
 
-import com.buildingblocks.challenges.domain.card.Card;
-import com.buildingblocks.challenges.domain.player.entities.ActionHistory;
-import com.buildingblocks.challenges.domain.player.entities.Turn;
-import com.buildingblocks.challenges.domain.player.events.*;
+import com.buildingblocks.challenges.domain.board.entities.Card;
+import com.buildingblocks.challenges.domain.player.entities.GameRecord;
 import com.buildingblocks.challenges.domain.player.values.*;
 import com.buildingblocks.shared.domain.generic.AggregateRoot;
 import com.buildingblocks.shared.domain.generic.DomainEvent;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class Player extends AggregateRoot<PlayerId> {
-
     private NickName nickName;
-    private State state;
-    private List<Card> cards = new ArrayList<>();
-    private ActionHistory actionHistory;
-    private Turn turn;
+    private List<GameRecord> gameRecord;
+    private Deque<Card> hand;
 
     // region Constructors
 
     public Player() {
         super(new PlayerId());
-        this.state = State.of(StateEnum.INACTIVE);
-        this.actionHistory = new ActionHistory(new ArrayList<>(), LocalDateTime.now());
-        this.turn = new Turn(LocalTime.now(), null);
-        subscribe(new PlayerHandler(this));
-    }
-
-    public Player(String nickName) {
-        super(new PlayerId());
-        this.nickName = NickName.of(nickName);
-        this.state = State.of(StateEnum.INACTIVE);
-        this.actionHistory = new ActionHistory(new ArrayList<>(), LocalDateTime.now());
-        this.turn = new Turn(LocalTime.now(), null);
-        subscribe(new PlayerHandler(this));
+        this.gameRecord = new ArrayList<>();
+        this.hand = new ArrayDeque<>();
     }
 
     private Player(PlayerId identity) {
         super(identity);
-        this.state = State.of(StateEnum.INACTIVE);
-        this.actionHistory = new ActionHistory(new ArrayList<>(), LocalDateTime.now());
-        this.turn = new Turn(LocalTime.now(), null);
-        subscribe(new PlayerHandler(this));
     }
 
     // endregion
@@ -61,72 +41,33 @@ public class Player extends AggregateRoot<PlayerId> {
         this.nickName = nickName;
     }
 
-    public State getState() {
-        return state;
+    public List<GameRecord> getGameRecord() {
+        return gameRecord;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setGameRecord(List<GameRecord> gameRecord) {
+        this.gameRecord = gameRecord;
     }
 
-    public List<Card> getCards() {
-        return cards;
+    public Deque<Card> getHand() {
+        return hand;
     }
 
-    public void setCards(List<Card> cards) {
-        this.cards = new ArrayList<>(cards);
+    public void setHand(Deque<Card> hand) {
+        this.hand = hand;
     }
 
-    public ActionHistory getActionHistory() {
-        return actionHistory;
-    }
-
-    public void setActionHistory(ActionHistory actionHistory) {
-        this.actionHistory = actionHistory;
-    }
-
-    public Turn getTurn() {
-        return turn;
-    }
-
-    public void setTurn(Turn turn) {
-        this.turn = turn;
-    }
-
-    public String getNickNameValue() {
-        return this.nickName.getValue();
-    }
 
     // endregion
 
     // region Domain Events
 
-    public void createPlayer(String nickName) {
-        apply(new PlayerCreated(nickName));
-    }
 
-    public void drawnCard(String cardId) {
-        apply(new CardDrawn(cardId));
-    }
-
-    public void playCard(String  cardId) {
-        apply(new CardPlayed(cardId));
-    }
-
-    public void changeState(String state) {
-        apply(new PlayerStateChanged(state));
-    }
 
     // endregion
 
     // region Public methods
 
-    public void createInitialCards() {
-        for (int i = 0; i < 5; i++) {
-            Card card = new Card();
-            this.cards.add(card);
-        }
-    }
 
     // endregion
 
@@ -134,11 +75,11 @@ public class Player extends AggregateRoot<PlayerId> {
 
     // endregion
 
+
     public static Player from(final String identity, final List<DomainEvent> events) {
         Player player = new Player(PlayerId.of(identity));
         events.forEach(player::apply);
         player.markEventsAsCommitted();
         return player;
     }
-
 }

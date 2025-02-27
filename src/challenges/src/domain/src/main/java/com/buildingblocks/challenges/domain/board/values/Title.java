@@ -1,15 +1,19 @@
-package com.buildingblocks.challenges.domain.player.values;
+package com.buildingblocks.challenges.domain.board.values;
 
 import com.buildingblocks.shared.domain.generic.IValueObject;
 import com.buildingblocks.shared.domain.utils.ValidationUtils;
 
-public class NickName implements IValueObject {
+public class Title implements IValueObject {
 
     private final String value;
 
-    private NickName(String value) {
+    private Title(String value) {
         this.value = value;
         validate();
+    }
+
+    public static Title of(String value) {
+        return new Title(value);
     }
 
     @Override
