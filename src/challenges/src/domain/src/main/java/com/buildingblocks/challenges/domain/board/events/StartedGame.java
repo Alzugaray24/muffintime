@@ -1,4 +1,0 @@
-package com.buildingblocks.challenges.domain.board.events;
-
-public class StartedGame {
-}

@@ -23,12 +23,4 @@ public class CreateBoardUseCase implements ICommandUseCase<CreateBoardRequest, M
         board.markEventsAsCommitted();
         return Mono.just(BoardMapper.toResponse(board));
     }
-
-    public Mono<BoardResponse> executes(String name) {
-        Board board = new Board();
-        board.createBoard(name);
-        board.getUncommittedEvents().forEach(repository::save);
-        board.markEventsAsCommitted();
-        return Mono.just(BoardMapper.toResponse(board));
-    }
 }

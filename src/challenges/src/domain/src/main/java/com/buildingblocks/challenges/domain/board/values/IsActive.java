@@ -3,25 +3,25 @@ package com.buildingblocks.challenges.domain.board.values;
 import com.buildingblocks.shared.domain.generic.IValueObject;
 import com.buildingblocks.shared.domain.utils.ValidationUtils;
 
-public class Title implements IValueObject {
+public class IsActive implements IValueObject {
 
-    private final String value;
+    private final Boolean value;
 
-    private Title(String value) {
+    private IsActive(Boolean value) {
         this.value = value;
         validate();
     }
 
-    public static Title of(String value) {
-        return new Title(value);
+    public static IsActive of(Boolean value) {
+        return new IsActive(value);
     }
 
     @Override
     public void validate() {
-//        ValidationUtils.validateTextNotEmpty(value, "Title text cannot be empty");
+        ValidationUtils.validateBoolean(value, "IsActive value cannot be null");
     }
 
-    public String getValue() {
+    public Boolean getValue() {
         return value;
     }
 }

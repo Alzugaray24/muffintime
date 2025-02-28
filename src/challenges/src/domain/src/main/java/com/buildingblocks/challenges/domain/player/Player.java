@@ -2,7 +2,10 @@
 package com.buildingblocks.challenges.domain.player;
 
 import com.buildingblocks.challenges.domain.board.entities.Card;
+import com.buildingblocks.challenges.domain.board.values.Type;
 import com.buildingblocks.challenges.domain.player.entities.GameRecord;
+import com.buildingblocks.challenges.domain.player.entities.Level;
+import com.buildingblocks.challenges.domain.player.events.CreatedPlayer;
 import com.buildingblocks.challenges.domain.player.values.*;
 import com.buildingblocks.shared.domain.generic.AggregateRoot;
 import com.buildingblocks.shared.domain.generic.DomainEvent;
@@ -16,6 +19,7 @@ public class Player extends AggregateRoot<PlayerId> {
     private NickName nickName;
     private List<GameRecord> gameRecord;
     private Deque<Card> hand;
+    private Level level;
 
     // region Constructors
 
@@ -23,10 +27,16 @@ public class Player extends AggregateRoot<PlayerId> {
         super(new PlayerId());
         this.gameRecord = new ArrayList<>();
         this.hand = new ArrayDeque<>();
+        this.level = new Level(0, Type.of("beginner"));
+        initializeHandler();
     }
 
     private Player(PlayerId identity) {
         super(identity);
+        this.gameRecord = new ArrayList<>();
+        this.hand = new ArrayDeque<>();
+        this.level = new Level(0, Type.of("beginner"));
+        initializeHandler();
     }
 
     // endregion
@@ -57,24 +67,39 @@ public class Player extends AggregateRoot<PlayerId> {
         this.hand = hand;
     }
 
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
 
     // endregion
 
     // region Domain Events
 
-
+    public void createPlayer(String nickName) {
+        apply(new CreatedPlayer(nickName));
+    }
 
     // endregion
 
     // region Public methods
 
+    public void receiveCards(List<Card> cards) {
+        this.hand.addAll(cards);
+    }
 
     // endregion
 
     // region Private methods
 
-    // endregion
+    private void initializeHandler() {
+        subscribe(new PlayerHandler(this));
+    }
 
+    // endregion
 
     public static Player from(final String identity, final List<DomainEvent> events) {
         Player player = new Player(PlayerId.of(identity));

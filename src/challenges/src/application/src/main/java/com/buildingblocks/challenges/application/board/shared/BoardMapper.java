@@ -15,26 +15,26 @@ public class BoardMapper {
                         player.getIdentity().getValue(),
                         player.getNickName().getValue(),
                         player.getHand().stream()
-                                .map(card -> new BoardResponse.Card(card.getTitle().getValue(), card.getType().getValue()))
+                                .map(card -> new BoardResponse.Card(card.getIdentity().getValue(), card.getTitle().getValue(), card.getType().getValue()))
                                 .collect(Collectors.toCollection(ArrayDeque::new))
                 ))
                 .collect(Collectors.toList());
 
         // Map the deck of cards
         Deque<BoardResponse.Card> deckResponse = board.getDeck().stream()
-                .map(card -> new BoardResponse.Card(card.getTitle().getValue(), card.getType().getValue()))
+                .map(card -> new BoardResponse.Card(card.getIdentity().getValue(), card.getTitle().getValue(), card.getType().getValue()))
                 .collect(Collectors.toCollection(ArrayDeque::new));
 
         // Map the discard pile
         Deque<BoardResponse.Card> discardPileResponse = board.getDiscardPile().stream()
-                .map(card -> new BoardResponse.Card(card.getTitle().getValue(), card.getType().getValue()))
+                .map(card -> new BoardResponse.Card(card.getIdentity().getValue(), card.getTitle().getValue(), card.getType().getValue()))
                 .collect(Collectors.toCollection(ArrayDeque::new));
-
 
         // Create and return the BoardResponse
         return new BoardResponse(
                 board.getIdentity().getValue(),
                 board.getTitle().getValue(),
+                board.getIsActive(),
                 playerResponses,
                 deckResponse,
                 discardPileResponse

@@ -2,8 +2,11 @@ package com.buildingblocks.challenges.domain.board;
 
 import com.buildingblocks.challenges.domain.board.entities.Card;
 import com.buildingblocks.challenges.domain.board.entities.Turn;
+import com.buildingblocks.challenges.domain.board.events.AssignedPlayerToBoard;
 import com.buildingblocks.challenges.domain.board.events.CreatedBoard;
+import com.buildingblocks.challenges.domain.board.events.StartedBoard;
 import com.buildingblocks.challenges.domain.board.values.BoardId;
+import com.buildingblocks.challenges.domain.board.values.IsActive;
 import com.buildingblocks.challenges.domain.board.values.Title;
 import com.buildingblocks.challenges.domain.board.values.Type;
 import com.buildingblocks.challenges.domain.player.Player;
@@ -19,6 +22,7 @@ public class Board extends AggregateRoot<BoardId> {
     private Deque<Card> deck;
     private Deque<Card> discardPile;
     private List<Turn> turns;
+    private IsActive isActive;
 
     // region Constructors
 
@@ -28,11 +32,17 @@ public class Board extends AggregateRoot<BoardId> {
         this.deck = new ArrayDeque<>();
         this.discardPile = new ArrayDeque<>();
         this.turns = new ArrayList<>();
+        this.isActive = IsActive.of(false);
         initializeHandler();
     }
 
-    private Board(BoardId identity){
+    private Board(BoardId identity) {
         super(identity);
+        this.players = new ArrayList<>();
+        this.deck = new ArrayDeque<>();
+        this.discardPile = new ArrayDeque<>();
+        this.turns = new ArrayList<>();
+        this.isActive = IsActive.of(false);
         initializeHandler();
     }
 
@@ -81,6 +91,14 @@ public class Board extends AggregateRoot<BoardId> {
         this.discardPile = discardPile;
     }
 
+    public IsActive getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(IsActive isActive) {
+        this.isActive = isActive;
+    }
+
 
     // endregion
 
@@ -90,10 +108,30 @@ public class Board extends AggregateRoot<BoardId> {
         apply(new CreatedBoard(boardName));
     }
 
+    public void assignPlayerToBoard(Player player){
+        apply(new AssignedPlayerToBoard(player));
+    }
+
+    public void startBoard(String boardId){
+        apply(new StartedBoard(boardId));
+    }
+
     // endregion
 
     // region Public methods
 
+    public void start() {
+        isActive = IsActive.of(true);
+    }
+
+
+    public void addPlayer(Player player) {
+        if (players.size() > 2){
+            throw new IllegalArgumentException("The board is full");
+        }
+
+        players.add(player);
+    }
 
     // endregion
 
@@ -104,6 +142,11 @@ public class Board extends AggregateRoot<BoardId> {
     }
 
     public void generateDeck() {
+
+        if(deck == null) {
+            deck = new ArrayDeque<>();
+        }
+
         deck.clear();
 
         String[] types = {"Action", "Event", "Object", "Wild"};
@@ -165,4 +208,5 @@ public class Board extends AggregateRoot<BoardId> {
         board.markEventsAsCommitted();
         return board;
     }
+
 }

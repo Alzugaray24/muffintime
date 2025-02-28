@@ -1,5 +1,7 @@
 package com.buildingblocks.challenges.application.board.shared;
 
+import com.buildingblocks.challenges.domain.board.values.IsActive;
+
 import java.util.Deque;
 import java.util.List;
 
@@ -10,13 +12,15 @@ public class BoardResponse {
     private final List<Player> players;
     private final Deque<Card> discardPile;
     private final Deque<Card> deck;
+    private final IsActive isActive;
 
-    public BoardResponse(String boardId, String boardName, List<Player> players, Deque<Card> deck, Deque<Card> discardPile) {
+    public BoardResponse(String boardId, String boardName, IsActive isActive, List<Player> players, Deque<Card> deck, Deque<Card> discardPile) {
         this.boardId = boardId;
         this.boardName = boardName;
         this.players = players;
         this.discardPile = discardPile;
         this.deck = deck;
+        this.isActive = isActive;
     }
 
     // Getters
@@ -36,6 +40,9 @@ public class BoardResponse {
         return discardPile;
     }
 
+    public IsActive getIsActive() {
+        return isActive;
+    }
 
     public Deque<Card> getDeck() {
         return deck;
@@ -66,10 +73,12 @@ public class BoardResponse {
     }
 
     public static class Card {
+        private final String cardId;
         private final String title;
         private final String type;
 
-        public Card(String title, String type) {
+        public Card(String cardId, String title, String type) {
+            this.cardId = cardId;
             this.title = title;
             this.type = type;
         }
@@ -80,6 +89,10 @@ public class BoardResponse {
 
         public String getType() {
             return type;
+        }
+
+        public String getCardId() {
+            return cardId;
         }
     }
 
